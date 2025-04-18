@@ -1,14 +1,15 @@
 package View;
 
 import Controller.WumpusGameController;
+import Controller.WumpusGameControllerInterface;
 
 import javax.swing.*;
 
 public class WumpusGameEndView extends JPanel implements WumpusViewInterface {
 
-    private WumpusGameController controller;
+    private WumpusGameControllerInterface controller;
 
-    public WumpusGameEndView(WumpusGameController controller) {
+    public WumpusGameEndView(WumpusGameControllerInterface controller) {
         this.controller = controller;
         setUp();
     }
@@ -18,7 +19,8 @@ public class WumpusGameEndView extends JPanel implements WumpusViewInterface {
         super.setVisible(visible);
     }
 
-    private void setUp() {
+    @Override
+    public void setUp() {
 
         setLayout(new BoxLayout(this, BoxLayout.Y_AXIS));
         JLabel messageLabel = new JLabel("Game Over! " + controller.getMessage());
@@ -36,8 +38,16 @@ public class WumpusGameEndView extends JPanel implements WumpusViewInterface {
     }
 
     @Override
-    public void setController(WumpusGameController controller) {
+    public void setController(WumpusGameControllerInterface controller) {
        this.controller = controller;
     }
+    @Override
+    public WumpusGameControllerInterface getController() {
+        return this.controller;
+    }
 
+    @Override
+    public void update() {
+
+    }
 }

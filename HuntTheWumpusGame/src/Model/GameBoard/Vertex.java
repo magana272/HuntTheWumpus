@@ -1,5 +1,5 @@
 
-package Model;
+package Model.GameBoard;
 
 import java.util.ArrayList;
 
@@ -9,7 +9,7 @@ public class Vertex {
     private final int X;
     private final int Y;
 
-    ArrayList<Integer> edgesToVertexId;
+    private ArrayList<Integer> edgesToVertexId;
 
     public Vertex(int id, int x, int y) {
         this.id = id;
@@ -32,6 +32,7 @@ public class Vertex {
     public void setEdgesToVertexId(ArrayList<Integer> edgesToVertexId) {
         this.edgesToVertexId = edgesToVertexId;
     }
+
 
  
 }

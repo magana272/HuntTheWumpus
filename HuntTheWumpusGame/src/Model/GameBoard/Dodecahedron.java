@@ -1,7 +1,6 @@
-package Model;
+package Model.GameBoard;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 
@@ -64,9 +63,9 @@ public class Dodecahedron implements Map {
         for (int i = 0; i < 20; i++) {
             Cave cave = new Cave(i, coor[i][0], coor[i][1]);
             
-            cave.edgesToVertexId = new ArrayList<>();
+            cave.setEdgesToVertexId(new ArrayList<>());
             for (int j = 0; j < edgesList[i].length; j++) {
-                cave.edgesToVertexId.add(edgesList[i][j]);
+                cave.getEdgesToVertexId().add(edgesList[i][j]);
             }
 
             caves.add(cave);

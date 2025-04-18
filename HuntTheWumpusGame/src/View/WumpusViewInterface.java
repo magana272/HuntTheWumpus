@@ -1,8 +1,11 @@
 package View;
 
 import Controller.WumpusGameController;
+import Controller.WumpusGameControllerInterface;
 
-public interface WumpusViewInterface {
+public interface WumpusViewInterface extends ModelListener {
     void setVisible(boolean visible);
-    void setController(WumpusGameController controller);
+    void setController(WumpusGameControllerInterface controller);
+    WumpusGameControllerInterface getController();
+    public void setUp();
 }

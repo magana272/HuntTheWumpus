@@ -6,10 +6,11 @@ import java.awt.Container;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import Controller.WumpusGameController;
+import Controller.WumpusGameControllerInterface;
 
 public class StartButton extends JButton implements ActionListener {
-    private WumpusGameController controller;
-    public StartButton(String name, WumpusGameController controller) {
+    private WumpusGameControllerInterface controller;
+    public StartButton(String name, WumpusGameControllerInterface controller) {
         super(name);
         this.controller = controller; 
         this.addActionListener(this);

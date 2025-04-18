@@ -1,0 +1,9 @@
+<component name="ArtifactManager">
+  <artifact type="jar" name="HuntTheWumpus:jar">
+    <output-path>$PROJECT_DIR$/out/artifacts/HuntTheWumpus_jar</output-path>
+    <root id="archive" name="HuntTheWumpus.jar">
+      <element id="module-output" name="HuntTheWumpusGame" />
+      <element id="module-output" name="HuntTheWumpus" />
+    </root>
+  </artifact>
+</component>

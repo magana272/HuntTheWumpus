@@ -1,4 +1,4 @@
-package Model;
+package Model.GameBoard;
 
 import java.util.List;
 

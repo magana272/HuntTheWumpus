@@ -9,10 +9,11 @@ import javax.swing.JPanel;
 import javax.swing.JTextArea;
 
 import Controller.WumpusGameController;
+import Controller.WumpusGameControllerInterface;
 
 public class WumpusGameStartView extends JPanel implements WumpusViewInterface {
-    WumpusGameController controller;
-    public WumpusGameStartView(WumpusGameController controller) {
+    WumpusGameControllerInterface controller;
+    public WumpusGameStartView(WumpusGameControllerInterface controller) {
         this.controller = controller;
         setPreferredSize(new Dimension(750, 800));
         this.addComponentListener(new java.awt.event.ComponentAdapter() {
@@ -22,6 +23,7 @@ public class WumpusGameStartView extends JPanel implements WumpusViewInterface {
         });
         setUp();
     }
+    @Override
     public void setUp() {  
         setLayout(new BorderLayout());
         JPanel bottomRightPanel = new JPanel();
@@ -62,7 +64,7 @@ public class WumpusGameStartView extends JPanel implements WumpusViewInterface {
         add(wrapperPanel, BorderLayout.EAST);
     }
     @Override
-    public void setController(WumpusGameController controller) {
+    public void setController(WumpusGameControllerInterface controller) {
         this.controller = controller;
     }
 
@@ -74,6 +76,10 @@ public class WumpusGameStartView extends JPanel implements WumpusViewInterface {
         g.drawImage(wumpusImage.getImage(), 0, 0, getWidth(), getHeight(), this);
         
     }
+    @Override
+    public WumpusGameControllerInterface getController() {
+        return this.controller;
+    }
 
     public void resized(ComponentEvent e){
         int width = getWidth();
@@ -82,6 +88,10 @@ public class WumpusGameStartView extends JPanel implements WumpusViewInterface {
         revalidate();
         repaint();
     }
-    
-    
+
+
+    @Override
+    public void update() {
+
+    }
 }

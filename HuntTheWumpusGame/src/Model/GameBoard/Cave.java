@@ -1,4 +1,4 @@
-package Model;
+package Model.GameBoard;
 
 public class Cave extends Vertex implements NodeInterface {
     private boolean player = false;

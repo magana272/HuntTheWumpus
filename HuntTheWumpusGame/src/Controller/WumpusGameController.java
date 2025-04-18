@@ -1,8 +1,8 @@
 package Controller;
 
-import Model.Cave;
+import Model.GameBoard.Cave;
 import Model.WumpusGameModel;
-import Model.WumpusGameModelHard;
+import Model.WumpusGameModelnterface;
 import View.WumpusGameEndView;
 import View.WumpusGameStartView;
 import View.WumpusGameView;
@@ -10,12 +10,9 @@ import View.WumpusViewInterface;
 
 import javax.swing.*;
 import java.awt.*;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
-import java.util.ArrayList;
 
-public class WumpusGameController {
-    private WumpusGameModel model;
+public class WumpusGameController extends WumpusGameControllerInterface {
+    private WumpusGameModelnterface model;
     private WumpusViewInterface view;
     private JFrame gameWindow;
 
@@ -25,7 +22,6 @@ public class WumpusGameController {
         view.setVisible(true);
     
     }
-
     public void startScreen(){
         view.setVisible(true);
         gameWindow.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -39,31 +35,23 @@ public class WumpusGameController {
         gameWindow.setLocationRelativeTo(null);
         gameWindow.setVisible(true);
         gameWindow.revalidate();
-
+        this.model.registerObserver(this.view);
     }
 
-    public void startGame(){
-        gameWindow.remove((Component) this.view);
-        this.view = new WumpusGameView(this);
-        this.model = new WumpusGameModel();
-        gameWindow.add((Component) this.view, BorderLayout.CENTER);
-        gameWindow.revalidate();
-    }
-
-    public void gameOver(){
-        gameWindow.remove((Component) this.view);
-        this.view = new WumpusGameEndView(this);
-        gameWindow.add((Component) this.view, BorderLayout.CENTER);
-        gameWindow.revalidate();
-    }
     public String getMessage(){
+        if(model==null){
+            return "";
+        }
         return model.getMessage();
     }
-    public WumpusGameModel getModel() {
-        return model;
-    }
+
     public Cave getPlayerPostion(){
         return model.getPlayerCave();
+    }
+
+    @Override
+    public boolean cheatsEnabled() {
+        return model.cheatsEnabled();
     }
 
     public void moveToCave(int id) {
@@ -71,7 +59,7 @@ public class WumpusGameController {
         if (playerCave.getID() == id) {
               return; 
         }
-        if(id < 0 || id >= model.getDodecahedron().getCaves().size()) {
+        if(id < 0 || id >= model.getmap().getCaves().size()) {
             return;
         }
         if (playerCave.getEdgesToVertexId().contains(id)) {
@@ -85,7 +73,7 @@ public class WumpusGameController {
         if (playerCave.getID() == id) {
             return; 
         }
-        if (id < 0 || id >= model.getDodecahedron().getCaves().size()) {
+        if (id < 0 || id >= model.getmap().getCaves().size()) {
             return;
         }
         if (playerCave.getEdgesToVertexId().contains(id)) {
@@ -93,12 +81,43 @@ public class WumpusGameController {
         }
         validateGameState();
     }
+
+    @Override
+    public void setCheatsEnabled() {
+         model.setCheats();
+    }
+
+
+    @Override
+    public void setModel(WumpusGameModelnterface model) {
+        this.model = model;
+    }
+    @Override
+    public void startGame(){
+        gameWindow.remove((Component) this.view);
+        this.model = new WumpusGameModel();
+        this.view = new WumpusGameView(this);
+        gameWindow.add((Component) this.view, BorderLayout.CENTER);
+        gameWindow.revalidate();
+    }
+    @Override
+    public void gameOver(){
+        gameWindow.remove((Component) this.view);
+        this.view = new WumpusGameEndView(this);
+        gameWindow.add((Component) this.view, BorderLayout.CENTER);
+        gameWindow.revalidate();
+    }
+    @Override
+    public WumpusGameModelnterface getModel() {
+        return model;
+    }
+    @Override
     public void validateGameState() {
         System.out.println("Validating game state...");
-        if(model.wumpusIsAlive() == false) {
+        if(!model.wumpusIsAlive()) {
             System.out.println("Wumpus is dead!In gameOver()");
             gameOver();
-        } 
+        }
         if(model.getPlayerCave().containsWumpus()) {
             gameOver();
         } else if(model.getPlayerCave().containsPit()) {
@@ -107,14 +126,5 @@ public class WumpusGameController {
             gameOver();
         }
     }
-
-    public boolean cheatsEnabled() {
-        return model.cheatsEnabled();
-    }
-
-    public void setCheatsEnabled() {
-        model.setCheats();
-    }
-
 
 }

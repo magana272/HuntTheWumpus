@@ -1,10 +1,15 @@
 package Model;
 
-import java.lang.reflect.Array;
 import java.util.ArrayList;
+import java.util.List;
 
-public class WumpusGameModel {
-    private Dodecahedron dodecahedron = new Dodecahedron();
+import Model.GameBoard.Cave;
+import Model.GameBoard.Dodecahedron;
+import Model.GameBoard.Map;
+import View.ModelListener;
+
+public class WumpusGameModel implements GamePublisher, WumpusGameModelnterface{
+    private Map map = new Dodecahedron();
     private Cave playerPostion;
     int wumpusVertexId;
     private Cave wumpusVertex;
@@ -17,6 +22,10 @@ public class WumpusGameModel {
     private boolean WumpusAlive = true;
     private boolean gameOver = false;
     private boolean cheatsEnabled;
+
+
+    private String gameMessage = "";
+    private List<ModelListener> listeners = new ArrayList<>();
     
     public WumpusGameModel() {
         MAX_BATS = 2;
@@ -31,7 +40,7 @@ public class WumpusGameModel {
         placeWumpus();
     }
     public WumpusGameModel(int numPits, int numBats, int numWumpus) {
-        this.dodecahedron = new Dodecahedron();
+        this.map = new Dodecahedron();
         this.MAX_PITS = numPits;
         this.MAX_BATS = numBats;
         this.MAX_WUMPUS = numWumpus;
@@ -44,19 +53,16 @@ public class WumpusGameModel {
         placeBats();
         placeWumpus();
     }
-    
-    public Dodecahedron getDodecahedron() {
-        return dodecahedron;
-    }
+
     private void initializeBoard() {
-        dodecahedron = new Dodecahedron();
+        map = new Dodecahedron();
     }
     private void placeWumpus() {
         for (int i = 0; i < MAX_WUMPUS; i++) {
-            wumpusVertexId = (int) (Math.random() * dodecahedron.getCaves().size());
-            boolean set = dodecahedron.getCaves().get(wumpusVertexId).setWumpus(true);
+            wumpusVertexId = (int) (Math.random() * map.getCaves().size());
+            boolean set = map.getCaves().get(wumpusVertexId).setWumpus(true);
             if (set) {
-                wumpusVertex = dodecahedron.getCaves().get(wumpusVertexId);
+                wumpusVertex = map.getCaves().get(wumpusVertexId);
             } else {
                 i--;
             }
@@ -65,20 +71,20 @@ public class WumpusGameModel {
 
     }
     private void placePlayer() {
-        int playerVertexId = (int) (Math.random() * dodecahedron.getCaves().size());
-        boolean set = dodecahedron.getCaves().get(playerVertexId).setPlayer(true);
+        int playerVertexId = (int) (Math.random() * map.getCaves().size());
+        boolean set = map.getCaves().get(playerVertexId).setPlayer(true);
         if (!set) {
             placePlayer();
         }
-        this.playerPostion = dodecahedron.getCaves().get(playerVertexId);
+        this.playerPostion = map.getCaves().get(playerVertexId);
 
     }
     private void placePits() {
         for (int i = 0; i < MAX_PITS; i++) {
-            int pitVertexId = (int) (Math.random() * dodecahedron.getCaves().size());
-            boolean set = dodecahedron.getCaves().get(pitVertexId).setPit(true);
+            int pitVertexId = (int) (Math.random() * map.getCaves().size());
+            boolean set = map.getCaves().get(pitVertexId).setPit(true);
             if (set) {
-                pitCaves[i] = dodecahedron.getCaves().get(pitVertexId);
+                pitCaves[i] = map.getCaves().get(pitVertexId);
             } else {
                 i--;
             }
@@ -86,29 +92,38 @@ public class WumpusGameModel {
     }
     public void placeBats() {
         for (int i = 0; i < MAX_BATS; i++) {
-            int batVertexId = (int) (Math.random() * dodecahedron.getCaves().size());
-            boolean set = dodecahedron.getCaves().get(batVertexId).setBat(true);
+            int batVertexId = (int) (Math.random() * map.getCaves().size());
+            boolean set = map.getCaves().get(batVertexId).setBat(true);
             if (set) {
-                batCaves[i] = dodecahedron.getCaves().get(batVertexId);
+                batCaves[i] = map.getCaves().get(batVertexId);
             } else {
                 i--;
             }
         }
     }
+
+    @Override
+    public Map getmap() {
+        return map;
+    }
+
+
+    @Override
     public void movePlayer(int caveId) {
-        if (caveId >= 0 && caveId < dodecahedron.getCaves().size()) {
+        if (caveId >= 0 && caveId < map.getCaves().size()) {
             playerPostion.setPlayer(false);
-            dodecahedron.getCaves().get(caveId).setPlayer(true);
-            playerPostion = dodecahedron.getCaves().get(caveId);
+            map.getCaves().get(caveId).setPlayer(true);
+            playerPostion = map.getCaves().get(caveId);
 
             if(playerPostion.containsBat() && playerPostion.containsPit()){
                 int randomChance = (int) (Math.random() );
                 if(randomChance < .5){
                     playerPostion.setBat(false);
-                    int newCaveId = (int) (Math.random() * dodecahedron.getCaves().size());
+                    int newCaveId = (int) (Math.random() * map.getCaves().size());
                     playerPostion.setPlayer(false);
-                    dodecahedron.getCaves().get(newCaveId).setPlayer(true);
-                    playerPostion = dodecahedron.getCaves().get(newCaveId);
+                    map.getCaves().get(newCaveId).setPlayer(true);
+                    playerPostion = map.getCaves().get(newCaveId);
+                    notifyObservers();
                     movePlayer(newCaveId);
                 }
                 else{
@@ -122,10 +137,12 @@ public class WumpusGameModel {
                 if(randomChance < .5){
                     System.out.println("You have been moved by a bat!");
                     playerPostion.setBat(false);
-                    int newCaveId = (int) (Math.random() * dodecahedron.getCaves().size());
+                    int newCaveId = (int) (Math.random() * map.getCaves().size());
                     playerPostion.setPlayer(false);
-                    dodecahedron.getCaves().get(newCaveId).setPlayer(true);
-                    playerPostion = dodecahedron.getCaves().get(newCaveId);
+                    map.getCaves().get(newCaveId).setPlayer(true);
+                    playerPostion = map.getCaves().get(newCaveId);
+                    notifyObservers();
+                    movePlayer(newCaveId);
                 }
                 else{
                     System.out.println("You are in a cave with a bat.");
@@ -143,49 +160,65 @@ public class WumpusGameModel {
         } else {
             System.out.println("Invalid cave ID.");
         }
+        notifyObservers();
     }
+
+    @Override
     public void shootArrow(int caveId) {
         if (arrowCount > 0) {
             arrowCount--;
+            notifyObservers();
             if (wumpusVertex.getID() == caveId) {
                 this.WumpusAlive = false;
                 System.out.println("Wumpus hit!");
                 this.gameOver = true;
             } else {
                 System.out.println("Arrow missed.");
+                if(arrowCount==0){
+                    this.gameOver = true;
+                }
             }
         } else {
             this.gameOver = true;
         }
+        notifyObservers();
     }
+    @Override
     public int getArrowCount() {
         return arrowCount;
     }
+    @Override
     public Cave getPlayerCave() {
         return playerPostion;
     }
+    @Override
     public String getMessage(){
         ArrayList<Integer> cavesConnectedToPlayer = playerPostion.getEdgesToVertexId();
         StringBuilder message = new StringBuilder("You are in cave " + playerPostion.getID() + ".\n");
+
         if(!WumpusAlive){
             message = new StringBuilder("You have killed the Wumpus!\n");
+            gameMessage = message.toString();
             return message.toString();
         }
         if(playerPostion.containsBat()){
             message = new StringBuilder("You are in cave " + playerPostion.getID() + ".\n");
+            gameMessage = message.toString();
             return message.toString();
         }
         else if(playerPostion.containsWumpus()){
             message.append("You were eaten by the Wumpus\n");
+            gameMessage = message.toString();
             return message.toString();
         }
         else if(playerPostion.containsPit()){
             message.append("You fell into a bottomless pit\n");
+            gameMessage = message.toString();
             return message.toString();
         }
         else{
             for (int cID : cavesConnectedToPlayer){
-                Cave c = dodecahedron.getCaves().get(cID);
+                Cave c = map.getCaves().get(cID);
                 if(c.containsBat()){
                     message.append("You hear a bat nearby.\n");
                 }
@@ -212,19 +245,42 @@ public class WumpusGameModel {
             gameOver = true;
         }
     }
-
+    @Override
     public boolean wumpusIsAlive() {
         return WumpusAlive;
     }
+
+    @Override
     public boolean isGameOver() {
         return gameOver;
     }
-
+    @Override
     public boolean cheatsEnabled() {
         return cheatsEnabled;
     }
+    @Override
     public void setCheats(){
         this.cheatsEnabled = !this.cheatsEnabled;
+        notifyObservers();
+    }
+    @Override
+    public void registerObserver(ModelListener listener) {
+        if (!listeners.contains(listener)) {
+            listeners.add(listener);
+        }
+    }
+    @Override
+    public void removeObserver(ModelListener listener) {
+        if (listeners.contains(listener)) {
+            listeners.remove(listener);
+        }
+    }
+
+    @Override
+    public void notifyObservers() {
+        for (ModelListener listener : listeners) {
+            listener.update();
+        }
     }
 
 

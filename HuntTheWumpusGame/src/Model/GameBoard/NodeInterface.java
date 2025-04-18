@@ -1,13 +1,7 @@
-package Model;
+package Model.GameBoard;
 
-public interface NodeInterface {
+public interface NodeInterface  {
 
-    private void initializeVertices(){
-        return;
-    }
-    private void initializeEdges(){
-        return;
-    }
     boolean setPlayer(boolean set);
     boolean setWumpus(boolean set);
     boolean setPit(boolean set);
