@@ -8,7 +8,7 @@
 "Hunt the Wumpus" is a console-based game implemented using **Java Swing** with an **MVC** architecture. Players navigate a cave system, avoiding hazards like pits and the deadly Wumpus while trying to kill the Wumpus using arrows.
 
 ## Project Structure
-
+![HuntTheWumpusUML.jpg](HuntTheWumpusUML.jpg)
 - **Model**: Represents the game state and logic.
 - **View**: Displays the game interface.
 - **Controller**: Handles user input and coordinates the game flow.
